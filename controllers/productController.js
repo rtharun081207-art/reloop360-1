@@ -68,6 +68,19 @@ async function deleteProduct(req, res) {
     res.status(500).json({ message: 'Failed to delete product', error: err.message });
   }
 }
+async function createProduct(req, res) {
+  try {
+    const { icon, name, cat, price, cond, loc, exchange } = req.body;
+    const product = await Product.create({
+      icon, name, cat, price, cond, loc, exchange,
+      seller: req.user ? req.user.name : req.body.seller,
+      sellerId: req.user ? req.user.id : undefined,
+    });
+    res.status(201).json(product);
+  } catch (err) {
+    res.status(400).json({ message: 'Failed to create product', error: err.message });
+  }
+}
 
 module.exports = {
   getProducts,

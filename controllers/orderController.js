@@ -9,7 +9,13 @@ async function createOrder(req, res) {
     if (product.status === 'requested' || product.status === 'sold')
       return res.status(400).json({ message: 'Product is no longer available' });
 
-    const order = await Order.create({ product: productId, buyerName, sellerName: product.seller, mode: mode || 'buy' });
+    const order = await Order.create({
+      product: productId,
+      buyerName: req.user ? req.user.name : buyerName,
+      buyerId: req.user ? req.user.id : undefined,
+      sellerName: product.seller,
+      mode: mode || 'buy',
+    });
     product.status = 'requested';
     await product.save();
     res.status(201).json(order);
@@ -50,4 +56,14 @@ async function updateOrderStatus(req, res) {
   }
 }
 
-module.exports = { createOrder, getOrders, updateOrderStatus };
+async function getMyOrders(req, res) {
+  try {
+    const sent = await Order.find({ buyerId: req.user.id }).populate('product').sort({ createdAt: -1 });
+    const received = await Order.find({ sellerName: req.user.name }).populate('product').sort({ createdAt: -1 });
+    res.json({ sent, received });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch your orders', error: err.message });
+  }
+}
+
+module.exports = { createOrder, getOrders, updateOrderStatus, getMyOrders };

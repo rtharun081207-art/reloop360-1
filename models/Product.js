@@ -18,6 +18,7 @@ const productSchema = new mongoose.Schema(
     },
     loc: { type: String, required: [true, 'Location is required'] },
     seller: { type: String, required: [true, 'Seller name is required'] },
+    sellerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     verified: { type: Boolean, default: false },
     exchange: { type: Boolean, default: false },
     listingType: { type: String, enum: ['sell', 'want'], default: 'sell' },
