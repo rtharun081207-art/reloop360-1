@@ -2,7 +2,7 @@ const Product = require('../models/Product');
 
 async function getProducts(req, res) {
   try {
-    const { category, free, verified, exchange, location, sort } = req.query;
+    const { category, free, verified, exchange, location, sort, listingType } = req.query;
     const filter = {};
 
     if (category && category !== 'All') filter.cat = category;
@@ -10,6 +10,7 @@ async function getProducts(req, res) {
     if (verified === 'true') filter.verified = true;
     if (exchange === 'true') filter.exchange = true;
     if (location && location !== 'all') filter.loc = location;
+    filter.listingType = listingType || 'sell';
 
     let query = Product.find(filter);
 
@@ -36,9 +37,13 @@ async function getProductById(req, res) {
 
 async function createProduct(req, res) {
   try {
-    const { icon, name, cat, price, cond, loc, seller, verified, exchange } = req.body;
+    const { icon, name, description, cat, price, cond, loc, seller, verified, exchange, listingType } = req.body;
     const product = await Product.create({
-      icon, name, cat, price, cond, loc, seller, verified, exchange,
+      icon, name, description, cat, price, cond, loc,
+      seller: req.user ? req.user.name : seller,
+      sellerId: req.user ? req.user.id : undefined,
+      verified, exchange,
+      listingType: listingType || 'sell',
     });
     res.status(201).json(product);
   } catch (err) {
@@ -48,10 +53,7 @@ async function createProduct(req, res) {
 
 async function updateProduct(req, res) {
   try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (!product) return res.status(404).json({ message: 'Product not found' });
     res.json(product);
   } catch (err) {
@@ -68,24 +70,5 @@ async function deleteProduct(req, res) {
     res.status(500).json({ message: 'Failed to delete product', error: err.message });
   }
 }
-async function createProduct(req, res) {
-  try {
-    const { icon, name, cat, price, cond, loc, exchange } = req.body;
-    const product = await Product.create({
-      icon, name, cat, price, cond, loc, exchange,
-      seller: req.user ? req.user.name : req.body.seller,
-      sellerId: req.user ? req.user.id : undefined,
-    });
-    res.status(201).json(product);
-  } catch (err) {
-    res.status(400).json({ message: 'Failed to create product', error: err.message });
-  }
-}
 
-module.exports = {
-  getProducts,
-  getProductById,
-  createProduct,
-  updateProduct,
-  deleteProduct,
-};
+module.exports = { getProducts, getProductById, createProduct, updateProduct, deleteProduct };
