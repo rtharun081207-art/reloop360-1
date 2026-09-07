@@ -8,6 +8,7 @@ const matchRoutes = require('./routes/matchRoutes');
 const authRoutes = require('./routes/authRoutes');
 const materialRoutes = require('./routes/materialRoutes');
 const donationRoutes = require('./routes/donationRoutes');
+const exchangeRoutes = require('./routes/exchangeRoutes');
 const app = express();
 
 app.use(cors());
@@ -20,6 +21,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/materials', materialRoutes);
 app.use('/api/donations', donationRoutes);
+app.use('/api/exchanges', exchangeRoutes);
 // LoopMarket module
 app.use('/api/loopmarket', matchRoutes);
 app.get('/', (req, res) => {
