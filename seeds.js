@@ -1,7 +1,7 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
 const connectDB = require('./config/db');
-const Product = require('./models/Product');
+const Product = require('./models/Product.js');
 
 const demoProducts = [
   { icon: '📘', name: 'Programming Fundamentals (Used)', cat: 'Books', price: 250, cond: 'Good', loc: 'Chennai', seller: 'Ravi K.', verified: true, exchange: true },
